@@ -10,6 +10,6 @@ build:
 	go build -o ../$(BIN_DIR)/gw-notification ./cmd/main.go
 	@echo "Build complete!"
 
-run-exchanger:
+run-notification:
 	go run cmd/main.go
 

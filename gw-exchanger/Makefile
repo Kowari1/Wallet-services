@@ -1,7 +1,7 @@
 .PHONY: all build test clean run help docker-up docker-down swagger migrate
 
 BIN_DIR=bin
-APP_NAME=exchanger-app
+APP_NAME=exchanger-appmake
 
 all: build
 
