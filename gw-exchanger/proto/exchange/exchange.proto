@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package exchange;
+
+option go_package = "gw-exchanger/proto/exchange";
+
+service ExchangeService {
+  rpc GetRate(GetRateRequest) returns (GetRateResponse);
+  rpc GetAllRates(GetAllRatesRequest) returns (GetAllRatesResponse);
+}
+
+message GetRateRequest {
+  string from_currency = 1;
+  string to_currency = 2;
+}
+
+message GetRateResponse {
+  string from_currency = 1;
+  string to_currency = 2;
+  double rate = 3;
+  string updated_at = 4;
+}
+
+message GetAllRatesRequest {}
+
+message GetAllRatesResponse {
+  repeated GetRateResponse rates = 1;
+}

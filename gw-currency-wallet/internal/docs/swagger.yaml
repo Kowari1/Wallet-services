@@ -1,0 +1,294 @@
+basePath: /api/v1
+definitions:
+  models.Currency:
+    enum:
+    - RUB
+    - USD
+    - EUR
+    type: string
+    x-enum-varnames:
+    - RUB
+    - USD
+    - EUR
+  models.ExchangeRequest:
+    description: Currency exchange operation request
+    properties:
+      amount:
+        type: number
+      from_currency:
+        $ref: '#/definitions/models.Currency'
+      to_currency:
+        $ref: '#/definitions/models.Currency'
+    required:
+    - amount
+    - from_currency
+    - to_currency
+    type: object
+  models.LoginRequest:
+    description: User login request
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.RegisterRequest:
+    description: User registration request
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  models.Response:
+    description: Standard API response format
+    properties:
+      data: {}
+      details: {}
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.WalletOperationReq:
+    description: Wallet deposit/withdraw request
+    properties:
+      amount:
+        type: number
+      currency:
+        type: string
+    required:
+    - amount
+    - currency
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Currency wallet management service
+  title: Wallet Service API
+paths:
+  /balance:
+    get:
+      description: Get all currency balances for authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wallet balances retrieved
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Get wallet balances
+      tags:
+      - wallet
+  /deposit:
+    post:
+      consumes:
+      - application/json
+      description: Deposit money to wallet in specified currency
+      parameters:
+      - description: Deposit data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.WalletOperationReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Deposit successful
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Invalid request or deposit failed
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Deposit funds
+      tags:
+      - wallet
+  /exchange:
+    post:
+      consumes:
+      - application/json
+      description: Exchange money between currencies
+      parameters:
+      - description: Exchange data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ExchangeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Exchange successful
+          schema:
+            type: object
+        "400":
+          description: Invalid request or insufficient funds
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Exchange currency
+      tags:
+      - wallet
+  /exchange/rates:
+    get:
+      description: Get all available currency exchange rates
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rates retrieved
+          schema:
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Get exchange rates
+      tags:
+      - wallet
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: User login
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with wallet
+      parameters:
+      - description: Registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/models.Response'
+        "409":
+          description: User already exists or email already registered
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Register new user
+      tags:
+      - auth
+  /withdraw:
+    post:
+      consumes:
+      - application/json
+      description: Withdraw money from wallet in specified currency
+      parameters:
+      - description: Withdraw data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.WalletOperationReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Withdraw successful
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Invalid request or insufficient funds
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - BearerAuth: []
+      summary: Withdraw funds
+      tags:
+      - wallet
+swagger: "2.0"
